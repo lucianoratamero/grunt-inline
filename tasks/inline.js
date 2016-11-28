@@ -174,6 +174,22 @@ module.exports = function(grunt) {
 			grunt.log.debug('ret = : ' + ret +'\n');
 
 			return ret;
+		}).replace(/url\(["']*([^)'"]+)["']*\)/g, function(matchedWord, src){
+			var	ret = matchedWord;
+
+			if(!grunt.file.isPathAbsolute(src) && src.indexOf(options.tag)!=-1){
+
+				var inlineFilePath = path.resolve( path.dirname(filepath), src ).replace(/\?.*$/, '');
+
+				if( grunt.file.exists(inlineFilePath) ){
+					ret = matchedWord.replace(src, (new datauri(inlineFilePath)).content);
+				}else{
+					grunt.log.error("Couldn't find " + inlineFilePath + '!');
+				}
+			}
+			grunt.log.debug('ret = : ' + ret +'\n');
+
+			return ret;
 		});
 
 		return fileContent;
